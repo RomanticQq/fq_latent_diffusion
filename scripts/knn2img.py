@@ -12,7 +12,7 @@ from torchvision.utils import make_grid
 import scann
 import time
 from multiprocessing import cpu_count
-
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from ldm.util import instantiate_from_config, parallel_data_prefetch
 from ldm.models.diffusion.ddim import DDIMSampler
 from ldm.models.diffusion.plms import PLMSSampler
