@@ -6,7 +6,7 @@ from PIL import Image
 from tqdm import tqdm, trange
 from einops import rearrange
 from torchvision.utils import make_grid
-
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from ldm.util import instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
 from ldm.models.diffusion.plms import PLMSSampler
