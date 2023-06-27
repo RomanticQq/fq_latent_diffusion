@@ -4,7 +4,9 @@ from PIL import Image
 from tqdm import tqdm
 import numpy as np
 import torch
-from main import instantiate_from_config
+# from main import instantiate_from_config
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from ldm.util import instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
 
 
