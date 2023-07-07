@@ -118,11 +118,13 @@ class DDIMSampler(object):
                       unconditional_guidance_scale=1., unconditional_conditioning=None,):
         device = self.model.betas.device
         b = shape[0]
+        # 初始化生成噪声图片
         if x_T is None:
             img = torch.randn(shape, device=device)
         else:
             img = x_T
 
+        # 获取采样的步骤数组
         if timesteps is None:
             timesteps = self.ddpm_num_timesteps if ddim_use_original_steps else self.ddim_timesteps
         elif timesteps is not None and not ddim_use_original_steps:
@@ -130,7 +132,10 @@ class DDIMSampler(object):
             timesteps = self.ddim_timesteps[:subset_end]
 
         intermediates = {'x_inter': [img], 'pred_x0': [img]}
+        # 对选取的步骤的顺序进行反转
+        # np.flip() 对数组进行反转
         time_range = reversed(range(0,timesteps)) if ddim_use_original_steps else np.flip(timesteps)
+        # 计算总共有多少步骤
         total_steps = timesteps if ddim_use_original_steps else timesteps.shape[0]
         print(f"Running DDIM Sampling with {total_steps} timesteps")
 
@@ -138,6 +143,8 @@ class DDIMSampler(object):
 
         for i, step in enumerate(iterator):
             index = total_steps - i - 1
+            # torch.full(shape,num)  会生成纬度是shape,值全是num的数组
+            # 这里的b是生成图像的batch, step是使用alpha的当前步数，如951
             ts = torch.full((b,), step, device=device, dtype=torch.long)
 
             if mask is not None:
@@ -166,13 +173,14 @@ class DDIMSampler(object):
                       temperature=1., noise_dropout=0., score_corrector=None, corrector_kwargs=None,
                       unconditional_guidance_scale=1., unconditional_conditioning=None):
         b, *_, device = *x.shape, x.device
-
+        # x是图像噪声，c是文本条件， t当前的步数(大步数，不加速的)  index当前的步数(小步数，加速的)
         if unconditional_conditioning is None or unconditional_guidance_scale == 1.:
             e_t = self.model.apply_model(x, t, c)
         else:
             x_in = torch.cat([x] * 2)
             t_in = torch.cat([t] * 2)
             c_in = torch.cat([unconditional_conditioning, c])
+            # 使用unet模型
             e_t_uncond, e_t = self.model.apply_model(x_in, t_in, c_in).chunk(2)
             e_t = e_t_uncond + unconditional_guidance_scale * (e_t - e_t_uncond)
 

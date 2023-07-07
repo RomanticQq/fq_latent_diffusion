@@ -899,7 +899,7 @@ class LatentDiffusion(DDPM):
             key = 'c_concat' if self.model.conditioning_key == 'concat' else 'c_crossattn'
             cond = {key: cond}
 
-        if hasattr(self, "split_input_params"):
+        if hasattr(self, " "):
             assert len(cond) == 1  # todo can only deal with one conditioning atm
             assert not return_ids  
             ks = self.split_input_params["ks"]  # eg. (128, 128)
