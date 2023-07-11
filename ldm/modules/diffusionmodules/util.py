@@ -160,11 +160,14 @@ def timestep_embedding(timesteps, dim, max_period=10000, repeat_only=False):
     :param max_period: controls the minimum frequency of the embeddings.
     :return: an [N x dim] Tensor of positional embeddings.
     """
+    # 当repeat_only=True时，直接复制
     if not repeat_only:
         half = dim // 2
+        # freqs是一个定值，由max_period决定
         freqs = torch.exp(
             -math.log(max_period) * torch.arange(start=0, end=half, dtype=torch.float32) / half
         ).to(device=timesteps.device)
+        # 在这首先对一维数组进行升维，然后做矩阵乘法，eg:[2,1]*[1,160]=[2,160]
         args = timesteps[:, None].float() * freqs[None]
         embedding = torch.cat([torch.cos(args), torch.sin(args)], dim=-1)
         if dim % 2:

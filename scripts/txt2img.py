@@ -127,8 +127,11 @@ if __name__ == "__main__":
 
     all_samples=list()
     with torch.no_grad():
+        # 权重是否使用指数移动平均
+        # 可以参考链接进行理解https://blog.csdn.net/zhang2010hao/article/details/91599411
         with model.ema_scope():
             uc = None
+            # 当scale=1.0时，不读取negative prompt
             if opt.scale != 1.0:
                 uc = model.get_learned_conditioning(opt.n_samples * [""])
             for n in trange(opt.n_iter, desc="Sampling"):

@@ -721,6 +721,8 @@ class UNetModel(nn.Module):
         ), "must specify y if and only if the model is class-conditional"
         # x是噪声图像  timesteps是当前步骤数 context是生成条件
         hs = []
+        # timesteps.shape=2     self.model_channels=32
+        # t_emb.shape=[2,320]
         t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
         emb = self.time_embed(t_emb)
 
