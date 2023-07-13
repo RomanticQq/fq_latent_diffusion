@@ -119,10 +119,11 @@ class DDIMSampler(object):
                       unconditional_guidance_scale=1., unconditional_conditioning=None,):
         device = self.model.betas.device
         b = shape[0]
-        # 初始化生成噪声图片
         if x_T is None:
+            # 初始化生成噪声图片，用于文生图
             img = torch.randn(shape, device=device)
         else:
+            # 或者直接使用传入进来的x_T,用于图生图
             img = x_T
 
         # 获取采样的步骤数组
@@ -148,6 +149,7 @@ class DDIMSampler(object):
             # 这里的b是生成图像的batch, step是使用alpha的当前步数，如951
             ts = torch.full((b,), step, device=device, dtype=torch.long)
 
+            # 用于进行局部的重建，对部分区域的隐向量进行mask
             if mask is not None:
                 assert x0 is not None
                 img_orig = self.model.q_sample(x0, ts)  # TODO: deterministic forward pass?
@@ -175,14 +177,22 @@ class DDIMSampler(object):
                       unconditional_guidance_scale=1., unconditional_conditioning=None):
         b, *_, device = *x.shape, x.device
         # x是图像噪声，c是文本条件， t当前的步数(大步数，不加速的)  index当前的步数(小步数，加速的)
+        # 判断是否有neg prompt, unconditional_conditioning是由neg prompt得到的
+        # 当没有neg prompt或者unconditional_guidance_scale=1.时,没有neg条件
         if unconditional_conditioning is None or unconditional_guidance_scale == 1.:
             e_t = self.model.apply_model(x, t, c)
         else:
+            # 一般都是有neg prompt的，所以进入到这里
+            # 在这里我们对隐向量和步数进行复制，一个属于pos prompt，一个属于neg prompt
+            # torch.cat默认堆叠维度为0，所以是在bs维度进行堆叠，二者不会互相影响
             x_in = torch.cat([x] * 2)
             t_in = torch.cat([t] * 2)
             c_in = torch.cat([unconditional_conditioning, c])
             # 使用unet模型
             e_t_uncond, e_t = self.model.apply_model(x_in, t_in, c_in).chunk(2)
+            # 下面这一句可以写成
+            # unconditional_guidance_scale可以控制pos噪声和neg噪声所占比例
+            # e_t  = unconditional_guidance_scale * e_t + (1. - unconditional_guidance_scale) * e_t_uncond
             e_t = e_t_uncond + unconditional_guidance_scale * (e_t - e_t_uncond)
 
         if score_corrector is not None:

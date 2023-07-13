@@ -171,6 +171,8 @@ class CrossAttention(nn.Module):
         h = self.heads
 
         q = self.to_q(x)
+        # 如果有context,则用context --> 交叉注意力机制
+        # 如果没有context,则用context=x --> 自注意力机制
         context = default(context, x)
         k = self.to_k(context)
         v = self.to_v(context)

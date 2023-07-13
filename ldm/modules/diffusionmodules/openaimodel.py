@@ -724,6 +724,7 @@ class UNetModel(nn.Module):
         # timesteps.shape=2     self.model_channels=32
         # t_emb.shape=[2,320]
         t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
+        # self.time_embed 全连接层
         emb = self.time_embed(t_emb)
 
         if self.num_classes is not None:

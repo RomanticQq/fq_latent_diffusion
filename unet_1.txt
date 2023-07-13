@@ -1,0 +1,37 @@
+ModuleList(
+  (0): TimestepEmbedSequential(
+    (0): Conv2d(4, 320, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+  (1-2): 2 x TimestepEmbedSequential(
+    (0): ResBlock()
+    (1): SpatialTransformer()
+  )
+  (3): TimestepEmbedSequential(
+    (0): Downsample()
+  )
+  (4): TimestepEmbedSequential(
+    (0): ResBlock()
+    (1): SpatialTransformer()
+  )
+  (5): TimestepEmbedSequential(
+    (0): ResBlock()
+    (1): SpatialTransformer()
+  )
+  (6): TimestepEmbedSequential(
+    (0): Downsample()
+  )
+  (7): TimestepEmbedSequential(
+    (0): ResBlock()
+    (1): SpatialTransformer()
+  )
+  (8): TimestepEmbedSequential(
+    (0): ResBlock()
+    (1): SpatialTransformer()
+  )
+  (9): TimestepEmbedSequential(
+    (0): Downsample()
+  )
+  (10-11): 2 x TimestepEmbedSequential(
+    (0): ResBlock()
+  )
+)
